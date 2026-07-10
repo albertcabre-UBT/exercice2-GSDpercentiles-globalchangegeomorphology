@@ -163,12 +163,16 @@ if distributions:
                 label=name,
                 color=color,
             )
-
         ax2.set_xscale("log")
 
-        ax2.xaxis.set_major_locator(LogLocator(base=10))
-        ax2.xaxis.set_major_formatter(LogFormatterMathtext(base=10))
-        ax2.xaxis.set_minor_locator(LogLocator(base=10, subs=np.arange(2, 10)))
+            xmin = min(np.min(distributions[s]) for s in selected)
+            xmax = max(np.max(distributions[s]) for s in selected)
+
+            ax2.set_xlim(xmin, xmax)
+
+            ax2.xaxis.set_major_locator(LogLocator(base=10))
+            ax2.xaxis.set_major_formatter(LogFormatterMathtext(base=10))
+            ax2.xaxis.set_minor_locator(LogLocator(base=10, subs=np.arange(2, 10)))
 
         for ax in [ax1, ax2]:
             for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:

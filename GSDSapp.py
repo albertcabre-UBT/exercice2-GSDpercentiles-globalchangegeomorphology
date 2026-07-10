@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import io
-
+from matplotlib.ticker import LogLocator, LogFormatterMathtext
 # ----------------------------------------------------------------------------
 # Page configuration
 # ----------------------------------------------------------------------------
@@ -165,6 +165,10 @@ if distributions:
             )
 
         ax2.set_xscale("log")
+
+        ax2.xaxis.set_major_locator(LogLocator(base=10))
+        ax2.xaxis.set_major_formatter(LogFormatterMathtext(base=10))
+        ax2.xaxis.set_minor_locator(LogLocator(base=10, subs=np.arange(2, 10)))
 
         for ax in [ax1, ax2]:
             for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:

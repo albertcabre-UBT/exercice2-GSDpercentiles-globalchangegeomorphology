@@ -120,8 +120,6 @@ if distributions:
         default=list(distributions.keys()),
     )
 
-    log_x = st.checkbox("Use logarithmic scale for grain size axis (X)", value=False)
-
     if selected:
         plt.rcParams.update(
             {
@@ -135,7 +133,9 @@ if distributions:
             }
         )
 
-        fig, ax = plt.subplots(figsize=(3.5, 3.5), dpi=200)
+        fig, axes = plt.subplots(1, 2, figsize=(8, 4), dpi=200)
+
+        ax1, ax2 = axes
 
         colors = plt.cm.tab10(np.linspace(0, 1, 10))
 
@@ -144,59 +144,49 @@ if distributions:
             n = len(vals)
             cdf = np.arange(1, n + 1) / n * 100
 
-            ax.step(
+            color = colors[list(distributions.keys()).index(name) % 10]
+
+            ax1.step(
                 vals,
                 cdf,
                 where="post",
-                linewidth=1,
+                linewidth=1.5,
                 label=name,
-                color=colors[list(distributions.keys()).index(name) % 10],
+                color=color,
             )
 
-        from matplotlib.ticker import LogLocator, NullFormatter
-        if log_x:
-            xmin = min(np.min(distributions[s]) for s in selected)
-            xmax = max(np.max(distributions[s]) for s in selected)
-
-            ax.set_xscale("log")
-            ax.set_xlim(xmin * 0.9, xmax * 1.1)
-        
-            ticks = [0.01, 0.02, 0.05,
-                     0.1, 0.2, 0.5,
-                     1, 2, 5,
-                     10, 20, 50]
-
-            xmin = min(np.min(distributions[s]) for s in selected)
-            xmax = max(np.max(distributions[s]) for s in selected)
-
-            ticks = [t for t in ticks if xmin <= t <= xmax]
-
-            ax.set_xticks(ticks)
-            ax.set_xticklabels([f"{t:g}" for t in ticks])
-
-            ax.grid(which="major", alpha=0.5)
-            ax.grid(which="minor", alpha=0.2)
-
-        for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:
-            ax.axhline(y=y_ref, color="gray", linestyle=":", linewidth=0.5)
-            ax.text(
-                ax.get_xlim()[1],
-                y_ref,
-                f" {label}",
-                va="center",
-                ha="left",
-                fontsize=7,
-                color="gray",
-                clip_on=False,
+            ax2.step(
+                vals,
+                cdf,
+                where="post",
+                linewidth=1.5,
+                label=name,
+                color=color,
             )
 
-        ax.set_xlabel("Grain size (mm)")
-        ax.set_ylabel("Cumulative percentage (%)")
-        ax.set_ylim(0, 100)
-        ax.set_box_aspect(1)
-        ax.legend(loc="upper left", fontsize=7, frameon=False)
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
+        ax2.set_xscale("log")
+
+        for ax in [ax1, ax2]:
+            for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:
+                ax.axhline(
+                    y=y_ref,
+                    color="gray",
+                    linestyle=":",
+                    linewidth=0.5,
+                )
+
+            ax.set_xlabel("Grain size (mm)")
+            ax.set_ylabel("Cumulative percentage (%)")
+            ax.set_ylim(0, 100)
+            ax.set_box_aspect(1)
+            ax.legend(fontsize=7, frameon=False)
+
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
+
+        ax1.set_title("Linear X-axis")
+        ax2.set_title("Log X-axis")
+
         fig.tight_layout()
 
         st.pyplot(fig, use_container_width=False)
@@ -211,9 +201,8 @@ if distributions:
             file_name="grain_size_cdf.png",
             mime="image/png",
         )
+
     else:
         st.warning("Select at least one sample to display its CDF.")
 else:
     st.info("Add data above to generate the plot.")
-
-st.markdown("---")

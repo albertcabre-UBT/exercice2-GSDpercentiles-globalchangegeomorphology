@@ -148,7 +148,7 @@ if distributions:
                 vals,
                 cdf,
                 where="post",
-                linewidth=2,
+                linewidth=1,
                 label=name,
                 color=colors[list(distributions.keys()).index(name) % 10],
             )

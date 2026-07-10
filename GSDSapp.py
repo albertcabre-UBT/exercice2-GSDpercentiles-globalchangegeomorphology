@@ -7,19 +7,19 @@ import io
 # ----------------------------------------------------------------------------
 # Page configuration
 # ----------------------------------------------------------------------------
-st.set_page_config(page_title="Grain Size Distribution Analyzer", layout="wide")
+st.set_page_config(page_title="Grain Size Distribution(s)", layout="wide")
 
 st.title("Grain Size Distribution Analyzer")
 st.markdown(
     """
     Paste your grain-size measurement data directly from Excel into the table
-    below. Each **row** represents one sample (distribution), and each
-    **column** represents one individual measurement. The number of
+    below. Each row represents one station (whole distribution), and each
+    column represents one individual measurement. The number of
     measurements per sample can vary, since not all samples have the same
     number of data points.
 
-    The app automatically computes the **D16, D50, and D84** percentiles for
-    each sample, and lets you plot the cumulative distribution function (CDF)
+    The app computes the D16, D50, and D84 percentiles for
+    each sample, and allows you to the cumulative distribution function (CDF)
     of the samples you choose.
     """
 )
@@ -35,11 +35,11 @@ DEFAULT_COLUMNS = 60
 # 1. Data input
 # ----------------------------------------------------------------------------
 st.subheader("1. Input data")
-st.caption(
-    "Rows are fixed at 10 samples. Columns represent individual measurements "
-    "within each sample and can be extended up to 500, since the number of "
-    "measurements per sample is variable. Leave unused cells empty."
-)
+#st.caption(
+#    "Rows are fixed at 10 samples. Columns represent individual measurements "
+#    "within each sample and can be extended up to 500, since the number of "
+#    "measurements per sample is variable. Leave unused cells empty."
+#)
 
 n_cols = st.number_input(
     "Number of measurement columns",
@@ -196,8 +196,8 @@ else:
     st.info("Add data above to generate the plot.")
 
 st.markdown("---")
-st.caption(
-    "D16, D50 and D84 are the grain sizes below which 16%, 50%, and 84% of the "
-    "sample falls, respectively. They are commonly used in sedimentology to "
-    "estimate the mean grain size and sorting of a sample."
-)
+#st.caption(
+#    "D16, D50 and D84 are the grain sizes below which 16%, 50%, and 84% of the "
+#    "sample falls, respectively. They are commonly used in sedimentology to "
+#    "estimate the mean grain size and sorting of a sample."
+#)

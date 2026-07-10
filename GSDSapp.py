@@ -8,16 +8,14 @@ import plotly.graph_objects as go
 # ----------------------------------------------------------------------------
 st.set_page_config(page_title="Grain Size Distribution Analyzer", layout="wide")
 
-st.title("Grain Size Distribution Analyzer")
+st.title("Grain Size Distribution(s)")
 st.markdown(
     """
-    Paste your grain-size measurement data directly from Excel into the table
-    below. Each **row** represents one sample (distribution), and each
-    **column** represents one individual measurement. The number of
-    measurements per sample can vary, since not all samples have the same
-    number of data points.
+    Paste your grain-size measurement data directly from excel into the table
+    below. Each row represents one sample (distribution), and each
+    column represents one individual measurement.
 
-    The app automatically computes the **D16, D50, and D84** percentiles for
+    The app automatically computes the D16, D50, and D84 percentiles for
     each sample, and lets you plot the cumulative distribution function (CDF)
     of the samples you choose.
     """
@@ -162,9 +160,9 @@ if distributions:
 else:
     st.info("Add data above to generate the plot.")
 
-st.markdown("---")
-st.caption(
-    "D16, D50 and D84 are the grain sizes below which 16%, 50%, and 84% of the "
-    "sample falls, respectively. They are commonly used in sedimentology to "
-    "estimate the mean grain size and sorting of a sample."
-)
+#st.markdown("---")
+# st.caption(
+#    "D16, D50 and D84 are the grain sizes below which 16%, 50%, and 84% of the "
+#    "sample falls, respectively. They are commonly used in sedimentology to "
+#    "estimate the mean grain size and sorting of a sample."
+#)

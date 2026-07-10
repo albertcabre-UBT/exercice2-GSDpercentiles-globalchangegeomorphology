@@ -146,26 +146,41 @@ if distributions:
 
             color = colors[list(distributions.keys()).index(name) % 10]
 
-            ax1.step(vals, cdf, where="post",
-                     linewidth=1.5, label=name, color=color)
+            ax1.step(
+                vals,
+                cdf,
+                where="post",
+                linewidth=1.5,
+                label=name,
+                color=color,
+            )
 
-            ax2.step(vals, cdf, where="post",
-                     linewidth=1.5, label=name, color=color)
+            ax2.step(
+                vals,
+                cdf,
+                where="post",
+                linewidth=1.5,
+                label=name,
+                color=color,
+            )
 
+        # Log-scale axis
         ax2.set_xscale("log")
 
         xmin = min(np.min(distributions[s]) for s in selected)
         xmax = max(np.max(distributions[s]) for s in selected)
 
+        xmin = 10 ** np.floor(np.log10(xmin))
+        xmax = 10 ** np.ceil(np.log10(xmax))
+
         ax2.set_xlim(xmin, xmax)
 
         ax2.xaxis.set_major_locator(LogLocator(base=10))
         ax2.xaxis.set_major_formatter(LogFormatterMathtext(base=10))
-        ax2.xaxis.set_minor_locator(
-            LogLocator(base=10, subs=np.arange(2, 10))
-        )
+        ax2.xaxis.set_minor_locator(LogLocator(base=10, subs=[]))
 
         for ax in [ax1, ax2]:
+
             for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:
                 ax.axhline(
                     y=y_ref,
@@ -178,7 +193,11 @@ if distributions:
             ax.set_ylabel("Cumulative percentage (%)")
             ax.set_ylim(0, 100)
             ax.set_box_aspect(1)
-            ax.legend(fontsize=7, frameon=False)
+
+            ax.legend(
+                fontsize=7,
+                frameon=False,
+            )
 
             ax.spines["top"].set_visible(False)
             ax.spines["right"].set_visible(False)
@@ -189,3 +208,25 @@ if distributions:
         fig.tight_layout()
 
         st.pyplot(fig, use_container_width=False)
+
+        buf = io.BytesIO()
+        fig.savefig(
+            buf,
+            format="png",
+            dpi=300,
+            bbox_inches="tight",
+        )
+        buf.seek(0)
+
+        st.download_button(
+            label="Download plot as PNG",
+            data=buf,
+            file_name="grain_size_cdf.png",
+            mime="image/png",
+        )
+
+    else:
+        st.warning("Select at least one sample to display its CDF.")
+
+else:
+    st.info("Add data above to generate the plot.")

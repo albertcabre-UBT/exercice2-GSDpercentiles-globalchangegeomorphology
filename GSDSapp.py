@@ -130,31 +130,50 @@ if distributions:
                 "axes.linewidth": 0.8,
                 "axes.grid": True,
                 "grid.color": "#cccccc",
-                "grid.linewidth": 0.5,
+                "grid.linewidth": 0.4,
                 "grid.linestyle": "--",
             }
         )
 
-        fig, ax = plt.subplots(figsize=(3, 3), dpi=150)
+        fig, ax = plt.subplots(figsize=(3.5, 3.5), dpi=200)
 
         colors = plt.cm.tab10(np.linspace(0, 1, 10))
 
         for i, name in enumerate(selected):
-            vals = distributions[name]
+            vals = np.sort(distributions[name])
             n = len(vals)
             cdf = np.arange(1, n + 1) / n * 100
-            ax.plot(
+
+            ax.step(
                 vals,
                 cdf,
-                marker="o",
-                markersize=1,
-                linewidth=1,
+                where="post",
+                linewidth=2,
                 label=name,
                 color=colors[list(distributions.keys()).index(name) % 10],
             )
 
+        if log_x:
+            ax.set_xscale("log")
+
+            ticks = [0.01, 0.02, 0.05,
+                     0.1, 0.2, 0.5,
+                     1, 2, 5,
+                     10, 20, 50]
+
+            xmin = min(np.min(distributions[s]) for s in selected)
+            xmax = max(np.max(distributions[s]) for s in selected)
+
+            ticks = [t for t in ticks if xmin <= t <= xmax]
+
+            ax.set_xticks(ticks)
+            ax.set_xticklabels([f"{t:g}" for t in ticks])
+
+            ax.grid(which="major", alpha=0.5)
+            ax.grid(which="minor", alpha=0.2)
+
         for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:
-            ax.axhline(y=y_ref, color="gray", linestyle=":", linewidth=0.1)
+            ax.axhline(y=y_ref, color="gray", linestyle=":", linewidth=0.5)
             ax.text(
                 ax.get_xlim()[1],
                 y_ref,
@@ -166,10 +185,7 @@ if distributions:
                 clip_on=False,
             )
 
-        if log_x:
-            ax.set_xscale("log")
-
-        ax.set_xlabel("Grain size")
+        ax.set_xlabel("Grain size (mm)")
         ax.set_ylabel("Cumulative percentage (%)")
         ax.set_ylim(0, 100)
         ax.set_box_aspect(1)
@@ -196,8 +212,3 @@ else:
     st.info("Add data above to generate the plot.")
 
 st.markdown("---")
-#st.caption(
-#    "D16, D50 and D84 are the grain sizes below which 16%, 50%, and 84% of the "
-#    "sample falls, respectively. They are commonly used in sedimentology to "
-#    "estimate the mean grain size and sorting of a sample."
-#)

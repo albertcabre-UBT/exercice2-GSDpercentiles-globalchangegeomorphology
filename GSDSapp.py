@@ -9,7 +9,7 @@ import io
 # ----------------------------------------------------------------------------
 st.set_page_config(page_title="Grain Size Distribution Analyzer", layout="wide")
 
-st.title("Grain Size Distribution(s)")
+st.title("Grain Size Distribution Analyzer")
 st.markdown(
     """
     Paste your grain-size measurement data directly from Excel into the table

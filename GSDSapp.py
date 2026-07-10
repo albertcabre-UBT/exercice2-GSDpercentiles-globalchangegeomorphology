@@ -111,7 +111,7 @@ else:
 # ----------------------------------------------------------------------------
 # 3. CDF plot
 # ----------------------------------------------------------------------------
-st.subheader("3. Cumulative Distribution Function (CDF) plot")
+st.subheader("3. Cumulative Distribution Function (CDF) plot(s)")
 
 if distributions:
     selected = st.multiselect(
@@ -147,8 +147,8 @@ if distributions:
                 vals,
                 cdf,
                 marker="o",
-                markersize=3,
-                linewidth=1.3,
+                markersize=1,
+                linewidth=1,
                 label=name,
                 color=colors[list(distributions.keys()).index(name) % 10],
             )

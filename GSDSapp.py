@@ -202,8 +202,8 @@ if distributions:
             ax.spines["top"].set_visible(False)
             ax.spines["right"].set_visible(False)
 
-        ax1.set_title("Linear X-axis")
-        ax2.set_title("Log X-axis")
+#        ax1.set_title("Linear X-axis")
+#        ax2.set_title("Log X-axis")
 
         fig.tight_layout()
 

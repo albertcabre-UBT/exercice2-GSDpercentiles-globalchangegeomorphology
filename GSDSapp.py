@@ -125,7 +125,7 @@ if distributions:
     if selected:
         plt.rcParams.update(
             {
-                "font.size": 11,
+                "font.size": 8,
                 "axes.edgecolor": "#333333",
                 "axes.linewidth": 0.8,
                 "axes.grid": True,
@@ -135,7 +135,7 @@ if distributions:
             }
         )
 
-        fig, ax = plt.subplots(figsize=(6, 6), dpi=150)
+        fig, ax = plt.subplots(figsize=(3, 3), dpi=150)
 
         colors = plt.cm.tab10(np.linspace(0, 1, 10))
 
@@ -154,14 +154,14 @@ if distributions:
             )
 
         for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:
-            ax.axhline(y=y_ref, color="gray", linestyle=":", linewidth=0.8)
+            ax.axhline(y=y_ref, color="gray", linestyle=":", linewidth=0.1)
             ax.text(
                 ax.get_xlim()[1],
                 y_ref,
                 f" {label}",
                 va="center",
                 ha="left",
-                fontsize=9,
+                fontsize=7,
                 color="gray",
                 clip_on=False,
             )
@@ -173,7 +173,7 @@ if distributions:
         ax.set_ylabel("Cumulative percentage (%)")
         ax.set_ylim(0, 100)
         ax.set_box_aspect(1)
-        ax.legend(loc="upper left", fontsize=9, frameon=False)
+        ax.legend(loc="upper left", fontsize=7, frameon=False)
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
         fig.tight_layout()

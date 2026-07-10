@@ -154,16 +154,13 @@ if distributions:
             )
 
         from matplotlib.ticker import LogLocator, NullFormatter
-
         if log_x:
-            from matplotlib.ticker import LogLocator, NullFormatter
+            xmin = min(np.min(distributions[s]) for s in selected)
+            xmax = max(np.max(distributions[s]) for s in selected)
 
             ax.set_xscale("log")
-
-            ax.xaxis.set_major_locator(LogLocator(base=10))
-            ax.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 5)))
-            ax.xaxis.set_minor_formatter(NullFormatter())
-
+            ax.set_xlim(xmin * 0.9, xmax * 1.1)
+        
             ticks = [0.01, 0.02, 0.05,
                      0.1, 0.2, 0.5,
                      1, 2, 5,

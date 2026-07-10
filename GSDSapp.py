@@ -153,8 +153,13 @@ if distributions:
                 color=colors[list(distributions.keys()).index(name) % 10],
             )
 
+        from matplotlib.ticker import LogLocator, NullFormatter
+
         if log_x:
-            ax.set_xscale("log")
+        ax.set_xscale("log")
+            ax.xaxis.set_major_locator(LogLocator(base=10))
+            ax.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 5)))
+            ax.xaxis.set_minor_formatter(NullFormatter())
 
             ticks = [0.01, 0.02, 0.05,
                      0.1, 0.2, 0.5,

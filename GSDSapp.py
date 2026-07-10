@@ -8,14 +8,18 @@ import plotly.graph_objects as go
 # ----------------------------------------------------------------------------
 st.set_page_config(page_title="Grain Size Distribution Analyzer", layout="wide")
 
-st.title("🪨 Grain Size Distribution Analyzer")
+st.title("Grain Size Distribution Analyzer")
 st.markdown(
     """
-    Paste up to **10 columns** of grain-size measurement data directly from Excel
-    into the table below. Each column represents one sample (distribution).
-    The app automatically computes the **D16, D50, and D84** percentiles for each
-    sample, and lets you plot the cumulative distribution function (CDF) of the
-    samples you choose.
+    Paste your grain-size measurement data directly from Excel into the table
+    below. Each **row** represents one sample (distribution), and each
+    **column** represents one individual measurement. The number of
+    measurements per sample can vary, since not all samples have the same
+    number of data points.
+
+    The app automatically computes the **D16, D50, and D84** percentiles for
+    each sample, and lets you plot the cumulative distribution function (CDF)
+    of the samples you choose.
     """
 )
 
@@ -23,26 +27,51 @@ st.markdown(
 # Settings
 # ----------------------------------------------------------------------------
 N_SAMPLES = 10
-DEFAULT_ROWS = 30
+MAX_COLUMNS = 500
+DEFAULT_COLUMNS = 60
 
 # ----------------------------------------------------------------------------
 # 1. Data input
 # ----------------------------------------------------------------------------
 st.subheader("1. Input data")
 st.caption(
-    "Copy a block of cells from Excel (up to 10 columns, one per sample) and "
-    "paste it directly into the table below. You can add or remove rows as needed."
+    "Rows are fixed at 10 samples. Columns represent individual measurements "
+    "within each sample and can be extended up to 500, since the number of "
+    "measurements per sample is variable. Leave unused cells empty."
+)
+
+n_cols = st.number_input(
+    "Number of measurement columns",
+    min_value=1,
+    max_value=MAX_COLUMNS,
+    value=DEFAULT_COLUMNS,
+    step=1,
+    help="Set this to at least the number of measurements in your largest sample.",
 )
 
 if "data" not in st.session_state:
-    cols = [f"Sample {i + 1}" for i in range(N_SAMPLES)]
+    row_labels = [f"Sample {i + 1}" for i in range(N_SAMPLES)]
+    col_labels = [f"M{i + 1}" for i in range(DEFAULT_COLUMNS)]
     st.session_state["data"] = pd.DataFrame(
-        np.nan, index=range(DEFAULT_ROWS), columns=cols
+        np.nan, index=row_labels, columns=col_labels
     )
+
+current_df = st.session_state["data"]
+current_n_cols = current_df.shape[1]
+
+if n_cols != current_n_cols:
+    if n_cols > current_n_cols:
+        new_cols = [f"M{i + 1}" for i in range(current_n_cols, n_cols)]
+        for c in new_cols:
+            current_df[c] = np.nan
+    else:
+        keep_cols = [f"M{i + 1}" for i in range(n_cols)]
+        current_df = current_df[keep_cols]
+    st.session_state["data"] = current_df
 
 edited_df = st.data_editor(
     st.session_state["data"],
-    num_rows="dynamic",
+    num_rows="fixed",
     use_container_width=True,
     key="grain_data_editor",
 )
@@ -57,16 +86,16 @@ st.subheader("2. Percentiles (D16, D50, D84)")
 distributions = {}
 stats_rows = []
 
-for col in edited_df.columns:
-    values = pd.to_numeric(edited_df[col], errors="coerce").dropna().values
+for row_label in edited_df.index:
+    values = pd.to_numeric(edited_df.loc[row_label], errors="coerce").dropna().values
     if len(values) >= 2:
         values_sorted = np.sort(values)
         d16 = float(np.percentile(values_sorted, 16))
         d50 = float(np.percentile(values_sorted, 50))
         d84 = float(np.percentile(values_sorted, 84))
-        distributions[col] = values_sorted
+        distributions[row_label] = values_sorted
         stats_rows.append(
-            {"Sample": col, "N": len(values_sorted), "D16": d16, "D50": d50, "D84": d84}
+            {"Sample": row_label, "N": len(values_sorted), "D16": d16, "D50": d50, "D84": d84}
         )
 
 if stats_rows:
@@ -76,7 +105,7 @@ if stats_rows:
         use_container_width=True,
     )
 else:
-    st.info("Enter at least 2 numeric values in one column to see percentile results.")
+    st.info("Enter at least 2 numeric values in one row to see percentile results.")
 
 # ----------------------------------------------------------------------------
 # 3. CDF plot

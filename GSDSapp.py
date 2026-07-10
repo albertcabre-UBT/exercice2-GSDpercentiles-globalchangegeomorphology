@@ -105,64 +105,97 @@ if stats_rows:
 else:
     st.info("Enter at least 2 numeric values in one row to see percentile results.")
 
-# ----------------------------------------------------------------------------
 # 3. CDF plot
 # ----------------------------------------------------------------------------
 st.subheader("3. Cumulative Distribution Function (CDF) plot")
-
+ 
 if distributions:
     selected = st.multiselect(
         "Select which sample(s) you want to plot:",
         options=list(distributions.keys()),
         default=list(distributions.keys()),
     )
-
+ 
     log_x = st.checkbox("Use logarithmic scale for grain size axis (X)", value=False)
-
+ 
     if selected:
-        fig = go.Figure()
-        for name in selected:
+        plt.rcParams.update(
+            {
+                "font.size": 11,
+                "axes.edgecolor": "#333333",
+                "axes.linewidth": 0.8,
+                "axes.grid": True,
+                "grid.color": "#cccccc",
+                "grid.linewidth": 0.5,
+                "grid.linestyle": "--",
+            }
+        )
+ 
+        fig, ax = plt.subplots(figsize=(6, 6), dpi=150)
+ 
+        colors = plt.cm.tab10(np.linspace(0, 1, 10))
+ 
+        for i, name in enumerate(selected):
             vals = distributions[name]
             n = len(vals)
-            cdf = np.arange(1, n + 1) / n * 100  # cumulative percentage
-            fig.add_trace(
-                go.Scatter(
-                    x=vals,
-                    y=cdf,
-                    mode="lines+markers",
-                    name=name,
-                )
+            cdf = np.arange(1, n + 1) / n * 100
+            ax.plot(
+                vals,
+                cdf,
+                marker="o",
+                markersize=3,
+                linewidth=1.3,
+                label=name,
+                color=colors[list(distributions.keys()).index(name) % 10],
             )
-
-        fig.update_layout(
-            xaxis_title="Grain size",
-            yaxis_title="Cumulative percentage (%)",
-            legend_title="Sample",
-            template="plotly_white",
-            height=550,
-        )
-        if log_x:
-            fig.update_xaxes(type="log")
-
+ 
         for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:
-            fig.add_hline(
-                y=y_ref,
-                line_dash="dot",
-                line_color="gray",
-                opacity=0.5,
-                annotation_text=label,
-                annotation_position="right",
+            ax.axhline(y=y_ref, color="gray", linestyle=":", linewidth=0.8)
+            ax.text(
+                ax.get_xlim()[1],
+                y_ref,
+                f" {label}",
+                va="center",
+                ha="left",
+                fontsize=9,
+                color="gray",
+                clip_on=False,
             )
-
-        st.plotly_chart(fig, use_container_width=True)
+ 
+        if log_x:
+            ax.set_xscale("log")
+ 
+        ax.set_xlabel("Grain size")
+        ax.set_ylabel("Cumulative percentage (%)")
+        ax.set_ylim(0, 100)
+        ax.set_box_aspect(1)
+        ax.legend(loc="upper left", fontsize=9, frameon=False)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        fig.tight_layout()
+ 
+        st.pyplot(fig, use_container_width=False)
+ 
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=300, bbox_inches="tight")
+        buf.seek(0)
+ 
+        st.download_button(
+            label="Download plot as PNG",
+            data=buf,
+            file_name="grain_size_cdf.png",
+            mime="image/png",
+        )
     else:
         st.warning("Select at least one sample to display its CDF.")
 else:
     st.info("Add data above to generate the plot.")
+ 
+st.markdown("---")
+st.caption(
+    "D16, D50 and D84 are the grain sizes below which 16%, 50%, and 84% of the "
+    "sample falls, respectively. They are commonly used in sedimentology to "
+    "estimate the mean grain size and sorting of a sample."
+)
+ 
 
-#st.markdown("---")
-# st.caption(
-#    "D16, D50 and D84 are the grain sizes below which 16%, 50%, and 84% of the "
-#    "sample falls, respectively. They are commonly used in sedimentology to "
-#    "estimate the mean grain size and sorting of a sample."
-#)

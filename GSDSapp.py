@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+import io
 
 # ----------------------------------------------------------------------------
 # Page configuration
@@ -11,11 +12,13 @@ st.set_page_config(page_title="Grain Size Distribution Analyzer", layout="wide")
 st.title("Grain Size Distribution(s)")
 st.markdown(
     """
-    Paste your grain-size measurement data directly from excel into the table
-    below. Each row represents one sample (distribution), and each
-    column represents one individual measurement.
+    Paste your grain-size measurement data directly from Excel into the table
+    below. Each **row** represents one sample (distribution), and each
+    **column** represents one individual measurement. The number of
+    measurements per sample can vary, since not all samples have the same
+    number of data points.
 
-    The app automatically computes the D16, D50, and D84 percentiles for
+    The app automatically computes the **D16, D50, and D84** percentiles for
     each sample, and lets you plot the cumulative distribution function (CDF)
     of the samples you choose.
     """
@@ -105,19 +108,20 @@ if stats_rows:
 else:
     st.info("Enter at least 2 numeric values in one row to see percentile results.")
 
+# ----------------------------------------------------------------------------
 # 3. CDF plot
 # ----------------------------------------------------------------------------
 st.subheader("3. Cumulative Distribution Function (CDF) plot")
- 
+
 if distributions:
     selected = st.multiselect(
         "Select which sample(s) you want to plot:",
         options=list(distributions.keys()),
         default=list(distributions.keys()),
     )
- 
+
     log_x = st.checkbox("Use logarithmic scale for grain size axis (X)", value=False)
- 
+
     if selected:
         plt.rcParams.update(
             {
@@ -130,11 +134,11 @@ if distributions:
                 "grid.linestyle": "--",
             }
         )
- 
+
         fig, ax = plt.subplots(figsize=(6, 6), dpi=150)
- 
+
         colors = plt.cm.tab10(np.linspace(0, 1, 10))
- 
+
         for i, name in enumerate(selected):
             vals = distributions[name]
             n = len(vals)
@@ -148,7 +152,7 @@ if distributions:
                 label=name,
                 color=colors[list(distributions.keys()).index(name) % 10],
             )
- 
+
         for y_ref, label in [(16, "D16"), (50, "D50"), (84, "D84")]:
             ax.axhline(y=y_ref, color="gray", linestyle=":", linewidth=0.8)
             ax.text(
@@ -161,10 +165,10 @@ if distributions:
                 color="gray",
                 clip_on=False,
             )
- 
+
         if log_x:
             ax.set_xscale("log")
- 
+
         ax.set_xlabel("Grain size")
         ax.set_ylabel("Cumulative percentage (%)")
         ax.set_ylim(0, 100)
@@ -173,13 +177,13 @@ if distributions:
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
         fig.tight_layout()
- 
+
         st.pyplot(fig, use_container_width=False)
- 
+
         buf = io.BytesIO()
         fig.savefig(buf, format="png", dpi=300, bbox_inches="tight")
         buf.seek(0)
- 
+
         st.download_button(
             label="Download plot as PNG",
             data=buf,
@@ -190,12 +194,10 @@ if distributions:
         st.warning("Select at least one sample to display its CDF.")
 else:
     st.info("Add data above to generate the plot.")
- 
+
 st.markdown("---")
 st.caption(
     "D16, D50 and D84 are the grain sizes below which 16%, 50%, and 84% of the "
     "sample falls, respectively. They are commonly used in sedimentology to "
     "estimate the mean grain size and sorting of a sample."
 )
- 
-

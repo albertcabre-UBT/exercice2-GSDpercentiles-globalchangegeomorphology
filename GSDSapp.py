@@ -156,7 +156,10 @@ if distributions:
         from matplotlib.ticker import LogLocator, NullFormatter
 
         if log_x:
-        ax.set_xscale("log")
+            from matplotlib.ticker import LogLocator, NullFormatter
+
+            ax.set_xscale("log")
+
             ax.xaxis.set_major_locator(LogLocator(base=10))
             ax.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 5)))
             ax.xaxis.set_minor_formatter(NullFormatter())
